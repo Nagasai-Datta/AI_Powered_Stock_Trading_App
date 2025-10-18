@@ -10,11 +10,13 @@ const Menu = () => {
   const handleMenuClick = (index) => {
     setSelectedMenu(index);
   };
+
   const handleSignOut = () => {
     localStorage.removeItem("authToken");
 
     // Redirect to the frontend project homepage
-    window.location.href = "http://localhost:3001"; // replace with frontend URL
+    window.location.href =
+      process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001"; // replace with frontend URL
   };
   const menuClass = "menu";
   const activeMenuClass = "menu selected";
