@@ -7,19 +7,18 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const { watchlist } = require("./data");
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
 const { OrdersModel } = require("./model/OrdersModel");
 const { UserModel } = require("./model/UserModel"); // new User model
-
+const axios = require("axios");
 const PORT = process.env.PORT || 8080;
 const url = process.env.MONGO_URL;
 
 const app = express();
 
 // Middlewares
-// app.use(cors()); //{ origin: "http://localhost:3000", credentials: true }
 
 app.use(
   cors({
@@ -106,6 +105,9 @@ app.get("/allHoldings", async (req, res) => {
   let allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
 });
+app.get("/allWatchLists", async (req, res) => {
+  res.json(watchlist);
+});
 
 app.get("/allPositions", async (req, res) => {
   let allPositions = await PositionsModel.find({});
@@ -175,6 +177,44 @@ app.delete("/deleteOrder/:uid", async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/chat", async (req, res) => {
+  const { question, holdings, watchlist } = req.body;
+
+  // Prepare the prompt for DeepSeek
+  const prompt = `
+You are a stock assistant.
+Current Holdings: ${JSON.stringify(holdings)}
+Watchlist: ${JSON.stringify(watchlist)}
+Question: ${question}
+
+Answer as a friendly assistant. Suggest which stocks to buy, hold, or sell today based only on this data. 
+Be concise and actionable.
+`;
+
+  try {
+    const dsRes = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "mistralai/mistral-7b-instruct:free",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const answer =
+      dsRes.data.choices[0]?.message?.content || "Couldn't analyze.";
+    res.json({ answer });
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    res.json({ answer: "Oops! Something went wrong with AI." });
   }
 });
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-
+import StockChatbot from "./StockChatbot";
 import Apps from "./Apps";
 import Funds from "./Funds";
 import Holdings from "./Holdings";
@@ -27,6 +27,7 @@ const Dashboard = () => {
           <Route path="/apps" element={<Apps />} />
         </Routes>
       </div>
+      <StockChatbot />
     </div>
   );
 };
