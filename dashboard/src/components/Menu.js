@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import ProfileCard from "./ProfileCard";
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0); //lets assume thet we r indexing through dashboard here 0->Dashboard, 1-> Orders etc.
   const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false); //for the profile button
@@ -8,6 +9,12 @@ const Menu = () => {
   };
   const handleMenuClick = (index) => {
     setSelectedMenu(index);
+  };
+  const handleSignOut = () => {
+    localStorage.removeItem("authToken");
+
+    // Redirect to the frontend project homepage
+    window.location.href = "http://localhost:3001"; // replace with frontend URL
   };
   const menuClass = "menu";
   const activeMenuClass = "menu selected";
@@ -83,9 +90,27 @@ const Menu = () => {
           </li>
         </ul>
         <hr />
-        <div className="profile" onClick={handleProfileClick}>
+        {/* Profile section */}
+        <div
+          className="profile"
+          onClick={handleProfileClick}
+          style={{ position: "relative" }}
+        >
           <div className="avatar">ZU</div>
           <p className="username">USERID</p>
+
+          {/* Show card below avatar when toggle is true */}
+          {isProfileDropDownOpen && (
+            <div
+              style={{ position: "absolute", top: "100%", left: 0, zIndex: 10 }}
+            >
+              <ProfileCard
+                username="USERID"
+                avatar="ZU"
+                onSignOut={handleSignOut} //pass a callback here for signout routing
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

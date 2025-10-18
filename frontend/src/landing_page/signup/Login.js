@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Signup = () => {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
-  //   const navigate = useNavigate();
+const Login = () => {
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:8080/signup", {
+    const res = await fetch("http://localhost:8080/login", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -19,7 +18,7 @@ const Signup = () => {
 
     const data = await res.json();
     if (res.ok) {
-      // Redirect to dashboard project URL
+      // Redirect to the dashboard project URL
       window.location.href = "http://localhost:3000"; // <-- change to your dashboard URL
     } else {
       alert(data.message);
@@ -29,20 +28,8 @@ const Signup = () => {
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow" style={{ width: "400px" }}>
-        <h3 className="text-center mb-4">Sign Up</h3>
+        <h3 className="text-center mb-4">Login</h3>
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Username</label>
-            <input
-              type="text"
-              className="form-control"
-              name="username"
-              placeholder="Enter username"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input
@@ -68,16 +55,16 @@ const Signup = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            Sign Up
+            Login
           </button>
         </form>
 
         <p className="mt-3 text-center">
-          Already have an account? <Link to="/login">Login</Link>
+          Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Login;

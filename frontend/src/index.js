@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import HomePage from "./landing_page/home/HomePage";
 import SignUp from "./landing_page/signup/Signup";
+import Login from "./landing_page/signup/Login";
 import AboutPage from "./landing_page/about/AboutPage";
 import PricingPage from "./landing_page/pricing/PricingPage";
 import ProductsPage from "./landing_page/products/ProductsPage";
@@ -18,6 +19,7 @@ root.render(
     <Routes>
       <Route path="/" element={<HomePage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/login" element={<Login />}></Route>
       <Route path="/about" element={<AboutPage />}></Route>
       <Route path="/product" element={<ProductsPage />}></Route>
       <Route path="/pricing" element={<PricingPage />}></Route>
