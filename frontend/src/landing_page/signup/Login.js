@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:8080/login", {
+    const res = await fetch(`${API_URL}/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

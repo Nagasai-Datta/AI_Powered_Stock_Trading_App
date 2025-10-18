@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import GeneralContext from "./GeneralContext";
 import "./BuyActionWindow.css";
-
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 const SellActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
@@ -11,7 +11,7 @@ const SellActionWindow = ({ uid }) => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/allOrders/${uid}`)
+      .get(`${API_URL}/allOrders/${uid}`)
       .then((res) => setAllOrders(res.data))
       .catch((err) => console.error(err));
   }, [uid]);
@@ -28,7 +28,7 @@ const SellActionWindow = ({ uid }) => {
       const remainingQty = userOrder.qty - stockQuantity;
 
       // POST: create sell order + update holdings
-      await axios.post("http://localhost:8080/newOrderSell", {
+      await axios.post(`${API_URL}/newOrderSell`, {
         name: uid,
         qty: remainingQty,
         price: stockPrice,
@@ -37,7 +37,7 @@ const SellActionWindow = ({ uid }) => {
 
       // DELETE if fully sold
       if (remainingQty === 0) {
-        await axios.delete(`http://localhost:8080/deleteOrder/${uid}`);
+        await axios.delete(`${API_URL}/deleteOrder/${uid}`);
       }
 
       closeSellWindow(); // CLOSE SELL WINDOW

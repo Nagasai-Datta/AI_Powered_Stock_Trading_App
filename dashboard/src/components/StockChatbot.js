@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./StockChatbot.css";
-axios.defaults.baseURL = "http://localhost:8080";
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true; // if you need session cookies
 export default function StockChatbot() {
   const [isOpen, setIsOpen] = useState(false);

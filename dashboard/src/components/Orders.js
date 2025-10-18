@@ -4,9 +4,9 @@ import axios from "axios";
 
 const Orders = () => {
   const [allOrders, setAllOrders] = useState([]);
-
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
   useEffect(() => {
-    axios.get("http://localhost:8080/allOrders").then((res) => {
+    axios.get(`${API_URL}/allOrders`).then((res) => {
       setAllOrders(res.data);
     });
   }, []);

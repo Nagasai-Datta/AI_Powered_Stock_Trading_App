@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
   useEffect(() => {
-    axios.get("http://localhost:8080/allHoldings").then((res) => {
+    axios.get(`${API_URL}/allHoldings`).then((res) => {
       setAllHoldings(res.data);
     });
   }, []);

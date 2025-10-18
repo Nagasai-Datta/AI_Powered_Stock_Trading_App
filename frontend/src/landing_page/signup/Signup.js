@@ -7,10 +7,10 @@ const Signup = () => {
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-
+  const API_URL = process.env.REACT_APP_BACKEND_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:8080/signup", {
+    const res = await fetch(`${API_URL}/signup`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
