@@ -16,11 +16,11 @@ const Signup = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-
+    const API_URL_DASHBOARD = process.env.REACT_APP_DASHBOARD_URL;
     const data = await res.json();
     if (res.ok) {
       // Redirect to dashboard project URL
-      window.location.href = "http://localhost:3000"; // <-- change to your dashboard URL
+      window.location.href = `${API_URL_DASHBOARD}`; // <-- change to your dashboard URL
     } else {
       alert(data.message);
     }
