@@ -276,6 +276,23 @@ app.get("/funds", ensureAuth, async (req, res) => {
   }
 });
 
+// Add (fake) funds to the user's cash balance after a mock payment.
+app.post("/funds/add", ensureAuth, async (req, res) => {
+  try {
+    const amount = Number(req.body.amount);
+    if (!Number.isFinite(amount) || amount <= 0)
+      return res.status(400).json({ message: "Enter a valid amount" });
+
+    const user = await UserModel.findById(req.user._id);
+    user.cash = round2(user.cash + amount);
+    await user.save();
+
+    res.json({ message: "Funds added", cash: round2(user.cash) });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 app.get("/transactions", ensureAuth, async (req, res) => {
   try {
     const txns = await TransactionModel.find({ userId: req.user._id }).sort({
@@ -404,6 +421,9 @@ Question: ${question}`;
     const dsRes = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
+        // Use OpenRouter's free router by default: it auto-selects an
+        // available free model, so a single model being retired won't
+        // break the chatbot. Override with AI_MODEL to pin a specific one.
         model: process.env.AI_MODEL || "openrouter/free",
         messages: [{ role: "user", content: prompt }],
       },

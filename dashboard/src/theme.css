@@ -207,3 +207,12 @@ body { background: var(--tt-bg); color: var(--tt-text); transition: background 0
 .tt-act-cancel { background: var(--tt-surface-3); color: var(--tt-text-muted); }
 .tt-modal-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tt-modal-err { color: var(--tt-down); font-size: 12px; padding: 0 18px 12px; }
+
+/* ---- payment gateway ---- */
+.tt-pay { width: 420px; max-width: 100%; background: var(--tt-surface); border: 1px solid var(--tt-border); border-radius: 14px; padding: 26px; margin-top: 8px; }
+.tt-pay-head { text-align: center; margin-bottom: 22px; }
+.tt-pay-logo { font-size: 22px; font-weight: 600; color: var(--tt-accent); letter-spacing: -0.01em; }
+.tt-pay-amount { background: var(--tt-accent-soft); border: 1px solid var(--tt-border); border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; }
+.tt-pay-amount-row { display: flex; align-items: center; gap: 6px; }
+.tt-pay-amount-row input { flex: 1; background: transparent; border: none; outline: none; color: var(--tt-text); font-size: 22px; font-weight: 600; width: 100%; }
+.tt-add-funds-btn { background: var(--tt-accent); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 18px; }

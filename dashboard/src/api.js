@@ -8,9 +8,11 @@ const api = axios.create({
 
 export const getQuotes = () => api.get("/quotes").then((r) => r.data);
 export const getHoldings = () => api.get("/holdings").then((r) => r.data);
-export const getSummary = () => api.get("/portfolio/summary").then((r) => r.data);
+export const getSummary = () =>
+  api.get("/portfolio/summary").then((r) => r.data);
 export const getFunds = () => api.get("/funds").then((r) => r.data);
-export const getTransactions = () => api.get("/transactions").then((r) => r.data);
+export const getTransactions = () =>
+  api.get("/transactions").then((r) => r.data);
 export const getMe = () => api.get("/me").then((r) => r.data);
 
 export const placeOrder = (ticker, side, qty, price) =>
@@ -20,5 +22,8 @@ export const demoLogin = () => api.post("/demo/login").then((r) => r.data);
 
 export default api;
 
-export const sendChat = (question) => api.post("/chat", { question }).then((r) => r.data);
+export const sendChat = (question) =>
+  api.post("/chat", { question }).then((r) => r.data);
 export const logout = () => api.get("/logout").then((r) => r.data);
+export const addFunds = (amount) =>
+  api.post("/funds/add", { amount }).then((r) => r.data);
