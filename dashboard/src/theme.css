@@ -181,3 +181,29 @@ body { background: var(--tt-bg); color: var(--tt-text); transition: background 0
 .tt-chat-input input:focus { border-color: var(--tt-accent); }
 .tt-chat-input button { background: var(--tt-accent); color: #fff; border: none; border-radius: 8px; padding: 0 14px; font-size: 13px; cursor: pointer; }
 .tt-disclaimer { font-size: 10px; color: var(--tt-text-faint); padding: 0 16px 10px; }
+
+/* ---- buy/sell modal ---- */
+.tt-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1100; }
+.tt-modal { width: 384px; max-width: calc(100vw - 32px); background: var(--tt-surface); border: 1px solid var(--tt-border); border-radius: 14px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+.tt-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--tt-border); }
+.tt-modal-tkr { font-size: 15px; font-weight: 600; color: var(--tt-text); }
+.tt-modal-name { font-size: 12px; color: var(--tt-text-faint); margin-top: 2px; }
+.tt-side-badge { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 6px; }
+.tt-side-badge.buy { background: var(--tt-accent-soft); color: var(--tt-accent); }
+.tt-side-badge.sell { background: var(--tt-down-soft); color: var(--tt-down); }
+.tt-modal-body { padding: 18px; }
+.tt-ltp { display: flex; align-items: baseline; gap: 9px; margin-bottom: 18px; }
+.tt-ltp .v { font-size: 24px; font-weight: 600; }
+.tt-field-row { display: flex; gap: 12px; margin-bottom: 14px; }
+.tt-field { flex: 1; }
+.tt-field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--tt-text-faint); margin-bottom: 6px; }
+.tt-field input { width: 100%; background: var(--tt-surface-2); border: 1px solid var(--tt-border); color: var(--tt-text); border-radius: 8px; padding: 10px 12px; font-size: 15px; font-family: var(--tt-mono); outline: none; box-sizing: border-box; }
+.tt-field input:focus { border-color: var(--tt-accent); }
+.tt-summary { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 0; border-top: 1px solid var(--tt-border); }
+.tt-modal-foot { display: flex; gap: 10px; padding: 4px 18px 18px; }
+.tt-modal-foot button { flex: 1; padding: 11px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; }
+.tt-act-buy { background: var(--tt-accent); color: #fff; }
+.tt-act-sell { background: var(--tt-down); color: #fff; }
+.tt-act-cancel { background: var(--tt-surface-3); color: var(--tt-text-muted); }
+.tt-modal-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
+.tt-modal-err { color: var(--tt-down); font-size: 12px; padding: 0 18px 12px; }

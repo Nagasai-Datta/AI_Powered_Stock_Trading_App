@@ -56,17 +56,21 @@ app.use(passport.session());
 
 // --------------------- PASSPORT ---------------------
 passport.use(
-  new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
-    try {
-      const user = await UserModel.findOne({ email });
-      if (!user) return done(null, false, { message: "User not found" });
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return done(null, false, { message: "Incorrect password" });
-      return done(null, user);
-    } catch (err) {
-      return done(err);
+  new LocalStrategy(
+    { usernameField: "email" },
+    async (email, password, done) => {
+      try {
+        const user = await UserModel.findOne({ email });
+        if (!user) return done(null, false, { message: "User not found" });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch)
+          return done(null, false, { message: "Incorrect password" });
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
     }
-  })
+  )
 );
 
 passport.serializeUser((user, done) => done(null, user.id));
@@ -101,13 +105,20 @@ app.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new UserModel({ username, email, password: hashedPassword });
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
     await newUser.save();
 
     req.login(newUser, (err) => {
       if (err)
         return res.status(500).json({ message: "Login after signup failed" });
-      return res.json({ message: "Signup successful", user: publicUser(newUser) });
+      return res.json({
+        message: "Signup successful",
+        user: publicUser(newUser),
+      });
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -136,7 +147,9 @@ const DEMO_EMAIL = "demo@tradeit.app";
 async function ensureDemoSeed(user) {
   const existing = await HoldingsModel.countDocuments({ userId: user._id });
   if (existing > 0) return;
-  const sectorOf = Object.fromEntries(seedStocks.map((s) => [s.ticker, s.sector]));
+  const sectorOf = Object.fromEntries(
+    seedStocks.map((s) => [s.ticker, s.sector])
+  );
   for (const h of demoHoldings) {
     await HoldingsModel.create({
       userId: user._id,
@@ -197,7 +210,10 @@ app.get("/allWatchLists", (req, res) => {
 // --------------------- HOLDINGS / PORTFOLIO ---------------------
 app.get("/holdings", ensureAuth, async (req, res) => {
   try {
-    const holdings = await HoldingsModel.find({ userId: req.user._id, qty: { $gt: 0 } });
+    const holdings = await HoldingsModel.find({
+      userId: req.user._id,
+      qty: { $gt: 0 },
+    });
     const enriched = holdings.map((h) => {
       const price = engine.getPrice(h.ticker) ?? h.avgCost;
       const value = price * h.qty;
@@ -221,7 +237,10 @@ app.get("/holdings", ensureAuth, async (req, res) => {
 
 app.get("/portfolio/summary", ensureAuth, async (req, res) => {
   try {
-    const holdings = await HoldingsModel.find({ userId: req.user._id, qty: { $gt: 0 } });
+    const holdings = await HoldingsModel.find({
+      userId: req.user._id,
+      qty: { $gt: 0 },
+    });
     const summary = summarize(
       holdings.map((h) => ({
         ticker: h.ticker,
@@ -241,7 +260,10 @@ app.get("/portfolio/summary", ensureAuth, async (req, res) => {
 
 app.get("/funds", ensureAuth, async (req, res) => {
   try {
-    const holdings = await HoldingsModel.find({ userId: req.user._id, qty: { $gt: 0 } });
+    const holdings = await HoldingsModel.find({
+      userId: req.user._id,
+      qty: { $gt: 0 },
+    });
     let invested = 0;
     for (const h of holdings) invested += h.avgCost * h.qty;
     res.json({
@@ -277,7 +299,9 @@ app.post("/order", ensureAuth, async (req, res) => {
     if (!engine.hasTicker(ticker))
       return res.status(400).json({ message: "Unknown ticker" });
     if (!Number.isFinite(quantity) || quantity <= 0)
-      return res.status(400).json({ message: "Quantity must be a positive number" });
+      return res
+        .status(400)
+        .json({ message: "Quantity must be a positive number" });
     if (tradeSide !== "BUY" && tradeSide !== "SELL")
       return res.status(400).json({ message: "Side must be BUY or SELL" });
 
@@ -286,7 +310,9 @@ app.post("/order", ensureAuth, async (req, res) => {
     if (!Number.isFinite(price) || price <= 0)
       return res.status(400).json({ message: "Invalid price" });
 
-    const sectorOf = Object.fromEntries(seedStocks.map((s) => [s.ticker, s.sector]));
+    const sectorOf = Object.fromEntries(
+      seedStocks.map((s) => [s.ticker, s.sector])
+    );
     let holding = await HoldingsModel.findOne({ userId: req.user._id, ticker });
     const user = await UserModel.findById(req.user._id);
 
@@ -349,7 +375,10 @@ app.post("/order", ensureAuth, async (req, res) => {
 app.post("/chat", ensureAuth, async (req, res) => {
   try {
     const { question } = req.body;
-    const holdings = await HoldingsModel.find({ userId: req.user._id, qty: { $gt: 0 } });
+    const holdings = await HoldingsModel.find({
+      userId: req.user._id,
+      qty: { $gt: 0 },
+    });
     const positions = holdings.map((h) => {
       const price = engine.getPrice(h.ticker) ?? h.avgCost;
       return {
@@ -375,7 +404,7 @@ Question: ${question}`;
     const dsRes = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "mistralai/mistral-7b-instruct:free",
+        model: process.env.AI_MODEL || "openrouter/free",
         messages: [{ role: "user", content: prompt }],
       },
       {
@@ -386,11 +415,14 @@ Question: ${question}`;
       }
     );
 
-    const answer = dsRes.data.choices[0]?.message?.content || "Couldn't analyze.";
+    const answer =
+      dsRes.data.choices[0]?.message?.content || "Couldn't analyze.";
     res.json({ answer });
   } catch (err) {
     console.error(err.response?.data || err.message);
-    res.status(500).json({ answer: "Something went wrong with the AI service." });
+    res
+      .status(500)
+      .json({ answer: "Something went wrong with the AI service." });
   }
 });
 
