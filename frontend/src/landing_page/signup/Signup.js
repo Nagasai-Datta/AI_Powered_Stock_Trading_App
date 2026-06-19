@@ -19,8 +19,12 @@ const Signup = () => {
     const API_URL_DASHBOARD = process.env.REACT_APP_DASHBOARD_URL;
     const data = await res.json();
     if (res.ok) {
-      // Redirect to dashboard project URL
-      window.location.href = `${API_URL_DASHBOARD}`; // <-- change to your dashboard URL
+      // Carry the auth token across to the dashboard (different domain), then
+      // the dashboard stores it and removes it from the URL.
+      const sep = API_URL_DASHBOARD.includes("?") ? "&" : "?";
+      window.location.href = data.token
+        ? `${API_URL_DASHBOARD}${sep}token=${encodeURIComponent(data.token)}`
+        : `${API_URL_DASHBOARD}`;
     } else {
       alert(data.message);
     }

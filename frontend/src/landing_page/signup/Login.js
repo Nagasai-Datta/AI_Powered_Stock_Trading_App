@@ -18,8 +18,13 @@ const Login = () => {
     const API_URL_DASHBOARD = process.env.REACT_APP_DASHBOARD_URL;
     const data = await res.json();
     if (res.ok) {
-      // Redirect to the dashboard project URL
-      window.location.href = `${API_URL_DASHBOARD}`; // <-- change to your dashboard URL
+      // Hand the auth token to the dashboard via the URL. It works across the
+      // two different domains (vercel.app -> the dashboard's domain) where a
+      // shared cookie can't, then the dashboard scrubs it from the URL.
+      const sep = API_URL_DASHBOARD.includes("?") ? "&" : "?";
+      window.location.href = data.token
+        ? `${API_URL_DASHBOARD}${sep}token=${encodeURIComponent(data.token)}`
+        : `${API_URL_DASHBOARD}`;
     } else {
       alert(data.message);
     }

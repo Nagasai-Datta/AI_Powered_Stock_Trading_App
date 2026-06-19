@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { OrdersModel } = require("./model/OrdersModel");
@@ -83,8 +84,41 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-function ensureAuth(req, res, next) {
+// Secret used to sign stateless auth tokens. Reuses SESSION_SECRET so there's
+// one thing to set; override with JWT_SECRET if you want them separate.
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  process.env.SESSION_SECRET ||
+  "dev-only-secret-change-me";
+
+// Issue a 7-day token carrying just the user id.
+const signToken = (user) =>
+  jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
+
+// Accept EITHER a Passport session (works same-site / locally / in Chrome) OR a
+// Bearer token (works cross-site in every browser, including Safari & Firefox,
+// because it isn't a cookie and so isn't subject to third-party-cookie blocking).
+// The frontend and API live on different domains (vercel.app vs onrender.com),
+// which makes the session cookie a third-party cookie that Safari/Firefox drop;
+// the token path is what keeps auth working there.
+async function ensureAuth(req, res, next) {
   if (req.isAuthenticated && req.isAuthenticated()) return next();
+
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+  if (token) {
+    try {
+      const payload = jwt.verify(token, JWT_SECRET);
+      const user = await UserModel.findById(payload.id);
+      if (user) {
+        req.user = user;
+        return next();
+      }
+    } catch (err) {
+      // invalid/expired token -> fall through to 401
+    }
+  }
+
   return res.status(401).json({ message: "Not authenticated" });
 }
 
@@ -118,6 +152,7 @@ app.post("/signup", async (req, res) => {
       return res.json({
         message: "Signup successful",
         user: publicUser(newUser),
+        token: signToken(newUser),
       });
     });
   } catch (err) {
@@ -126,7 +161,11 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ message: "Login successful", user: publicUser(req.user) });
+  res.json({
+    message: "Login successful",
+    user: publicUser(req.user),
+    token: signToken(req.user),
+  });
 });
 
 app.get("/logout", (req, res) => {
@@ -184,7 +223,11 @@ app.post("/demo/login", async (req, res) => {
     await ensureDemoSeed(demo);
     req.login(demo, (err) => {
       if (err) return res.status(500).json({ message: "Demo login failed" });
-      res.json({ message: "Demo session started", user: publicUser(demo) });
+      res.json({
+        message: "Demo session started",
+        user: publicUser(demo),
+        token: signToken(demo),
+      });
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
